@@ -1,0 +1,5 @@
+time cost: 26.62916350364685time each gen: 0.532583270072937
+Result
+Before refit: 0.9711538461538461  3  101After refit: 0.9333333333333333  3  42
+Before refit: 0.38461538461538464  1  40After refit: 0.2  1  9
+Before refit: 0.6923076923076923  2  72After refit: 0.6  2  27
