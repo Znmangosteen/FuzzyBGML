@@ -37,13 +37,14 @@ def run(data_set, size, gen_num, times):
     # for RS in population:
     #     print(str(RS.fitness) + '  ' + str(40 - RS.fitness2))
 
+    time_start = time.time()
+
     for i in range(times):
 
         # p = [0.9, 0.25, 0.5, 0.9, 0.25]
         p = [0.9, 0.25, 0.5, 0.9, 0.25]
         constant = [1]
 
-        time_start = time.time()
         print("start")
         pareto_set, population = algorithm.NSGAII(population=population, p=p, gen_num=gen_num, constant=constant,
                                                   size=size, trainingData=trainingData)
@@ -67,9 +68,12 @@ def run(data_set, size, gen_num, times):
                     RS.correct_num)
                 print(RS_before)
                 RS.getFitness(testData)
+
                 RS_after = "After refit: " + str(RS.fitness) + '  ' + str(40 - RS.fitness2) + '  ' + str(RS.correct_num)
                 print(RS_after)
                 RS_info += RS_before + '\r' + RS_after + '\r\n'
+
+                RS.getFitness(trainingData)
 
         result_print = time_info + '\r\nResult\r\n' + RS_info
 
@@ -78,17 +82,17 @@ def run(data_set, size, gen_num, times):
         exist_result = [int(x[:-4].split(' ')[0]) for x in os.listdir(path)]
         last_result = max(exist_result) if exist_result else 0
 
-        with open(path + '{0} c {1} g {2} s {3} e {4}.txt'.format(last_result + 1, 1, (i + 1) * gen_num, size, 0),
-                  'w') as f:
+        write_as = path + '{0} c {1} g {2} s {3} e {4}.txt'.format(last_result + 1, 1, (i + 1) * gen_num, size, 0)
+        with open(write_as, 'w') as f:
             f.write(result_print)
 
 
 if __name__ == '__main__':
-    data_set = "iris"
-    # data_set="a1_va3"
+    # data_set = "iris"
+    data_set = "a1_va3"
 
     size = 20
-    gen_num = 20
+    gen_num = 5
     times = 3
 
     run(data_set, size, gen_num, times)

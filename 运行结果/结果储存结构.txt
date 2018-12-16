@@ -3,4 +3,4 @@ result
 		-result data
 			-<id> c <core number> g <generation number> s <population size> e <generation number for every exchange>.txt
 		-figure
-			-f <from ith result(+jth result)> <B(Before refit) or A(After refit)> <S or M or C(compare)> <compare content>
+			-<id> f <from ith result(+jth result)> <B(Before refit) or A(After refit)> <S or M or C(compare)> <compare content>
