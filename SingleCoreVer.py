@@ -1,5 +1,5 @@
 import algorithm, util, random, time
-import fuzzyRule, os
+import fuzzyRule, os,sys
 
 
 def run(data_set, size, gen_num, times):
@@ -89,10 +89,14 @@ def run(data_set, size, gen_num, times):
 
 if __name__ == '__main__':
     # data_set = "iris"
-    data_set = "a1_va3"
+    # data_set = "a1_va3"
+    # data_set = "yeast"
+    data_set = sys.argv[1]
+
 
     size = 264
-    gen_num = 10000
-    times = 5
+    gen_num = int(sys.argv[2])
+    times = int(sys.argv[3])
+
 
     run(data_set, size, gen_num, times)
