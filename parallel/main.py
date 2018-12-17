@@ -103,7 +103,7 @@ if __name__ == '__main__':
 
     time_cost = time.time() - start
     print('time cost: ' + str(time_cost))
-    each_time = time_cost / 200
+    each_time = time_cost / (each_gen * total_time)
     print('time each gen: ' + str(each_time))
 
     pareto_set = []
