@@ -91,8 +91,8 @@ if __name__ == '__main__':
     # data_set = "iris"
     data_set = "a1_va3"
 
-    size = 20
-    gen_num = 5
-    times = 3
+    size = 264
+    gen_num = 10000
+    times = 5
 
     run(data_set, size, gen_num, times)
