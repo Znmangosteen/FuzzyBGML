@@ -9,7 +9,7 @@ y2 = []
 # x = [1,2,3,4,5]
 # y=[0.635,0.34,0.17,0.08,0.07]
 # y=[0.6645,0.34,0.19,0.07,0.07]
-with open('./运行结果/M/c12 size12 g20 t10.txt', 'r') as f:
+with open("./运行结果/a1_va3/result data/8 c 12 g 3000 s 264 e 100.txt", 'r') as f:
     file = f.read().splitlines()
     # print(file)
 
@@ -20,7 +20,7 @@ for line in range(3, len(file)):
         x.append(int(l[4]))
         y.append(1 - float(l[2]))
 
-with open('./运行结果/S/va3_150 200第一轮.txt', 'r') as f:
+with open("./运行结果/\"a1_va3\"/\"result data\"/\"8 c 12 g 3000 s 264 e 100.txt\"", 'r') as f:
     file = f.read().splitlines()
     # print(file)
 

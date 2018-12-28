@@ -1,5 +1,5 @@
 import algorithm, util, random, time
-import fuzzyRule, os,sys
+import fuzzyRule, os, sys
 
 
 def run(data_set, size, gen_num, times):
@@ -52,7 +52,7 @@ def run(data_set, size, gen_num, times):
         time_end = time.time()
         time_cost = time_end - time_start
 
-        time_info = "time cost: " + str(time_cost) + '\r' + "time each gen: " + str(time_cost / gen_num)
+        time_info = "time cost: " + str(time_cost) + '\r' + "time each gen: " + str(time_cost / gen_num * (i + 1))
         RS_info = ''
 
         print(time_info)
@@ -97,6 +97,5 @@ if __name__ == '__main__':
     size = 264
     gen_num = int(sys.argv[2])
     times = int(sys.argv[3])
-
 
     run(data_set, size, gen_num, times)

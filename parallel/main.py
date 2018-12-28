@@ -1,6 +1,6 @@
 import multiprocessing as mp
 import threading
-import algorithm, fuzzyRule, time
+import algorithm, fuzzyRule, time, sys, os
 
 from parallel.data_distributor import DataDistributor
 from parallel.data_reader import DataReader
@@ -48,13 +48,19 @@ def lisen(pipe):
 
 
 if __name__ == '__main__':
-    CPU_NUM = mp.cpu_count()
-    reader = DataReader()
+
+    data_set = sys.argv[1]
+    size = 264
+    each_gen = int(sys.argv[2])
+    total_time = int(sys.argv[3])
+    gen_num = each_gen * total_time
+
+    # CPU_NUM = mp.cpu_count()
+    CPU_NUM = 4
+    reader = DataReader(data_set)
     distributor = DataDistributor(CPU_NUM)
     popPool = PopPool()
     listen_lock = threading.RLock()
-    each_gen = 50
-    total_time = 12
 
     distributor.set_dataset(reader.getTrainingData())
     datasets = distributor.partition()
@@ -64,7 +70,7 @@ if __name__ == '__main__':
     lisen_threads = []
     for i in range(CPU_NUM):
         parent_conn, child_conn = mp.Pipe()
-        worker = mp.Process(target=run, args=(datasets[i], child_conn, 12, 5, each_gen, total_time))
+        worker = mp.Process(target=run, args=(datasets[i], child_conn, int(size/CPU_NUM), 5, each_gen, total_time))
         lisener = threading.Thread(target=lisen, args=(parent_conn,))
         init_worker.append(worker)
         lisen_threads.append(lisener)
@@ -102,9 +108,12 @@ if __name__ == '__main__':
     algorithm.pareto_ranking(fin_pop)
 
     time_cost = time.time() - start
-    print('time cost: ' + str(time_cost))
     each_time = time_cost / (each_gen * total_time)
-    print('time each gen: ' + str(each_time))
+
+    time_info = "time cost: " + str(time_cost) + '\r' + "time each gen: " + str(each_time)
+    RS_info = ''
+    print(time_info)
+    print('Result')
 
     pareto_set = []
     for RS in fin_pop:
@@ -117,6 +126,23 @@ if __name__ == '__main__':
             pass
         else:
             shown.add(RS.fitness2)
-            print("Before refit: " + str(RS.fitness) + '  ' + str(40 - RS.fitness2) + '  ' + str(RS.correct_num))
+            RS_before = "Before refit: " + str(RS.fitness) + '  ' + str(40 - RS.fitness2) + '  ' + str(
+                RS.correct_num)
+
+            print(RS_before)
             RS.getFitness(test_data)
-            print("After refit: " + str(RS.fitness) + '  ' + str(40 - RS.fitness2) + '  ' + str(RS.correct_num))
+            RS_after = "After refit: " + str(RS.fitness) + '  ' + str(40 - RS.fitness2) + '  ' + str(RS.correct_num)
+
+            print(RS_after)
+            RS_info += RS_before + '\r' + RS_after + '\r\n'
+
+    result_print = time_info + '\r\nResult\r\n' + RS_info
+
+    path = '../运行结果/' + data_set + '/result data/'
+
+    exist_result = [int(x[:-4].split(' ')[0]) for x in os.listdir(path)]
+    last_result = max(exist_result) if exist_result else 0
+
+    write_as = path + '{0} c {1} g {2} s {3} e {4}.txt'.format(last_result + 1, CPU_NUM,  gen_num, size, each_gen)
+    with open(write_as, 'w') as f:
+        f.write(result_print)

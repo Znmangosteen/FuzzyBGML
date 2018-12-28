@@ -3,14 +3,14 @@ import random, util
 
 
 class DataReader(object):
-    def __init__(self):
-        data, NClass, dictL2I, dictI2L = util.readData("../data/a1_va3.csv")
-        # data, NClass, dictL2I, dictI2L = util.readData("./data/iris.dat")
-        pData = 0.3  # proportion of training data
+    def __init__(self,data_set):
+
+        data, NClass, dictL2I, dictI2L = util.readData("../data/" + data_set + '.csv')
+        pData = 0.7  # proportion of training data
         N = int(pData * len(data))
         random.shuffle(data)
         self.trainingData = data[:N]
-        self.testData = data
+        self.testData = data[N:]
 
     def getTrainingData(self):
         return self.trainingData
@@ -18,6 +18,7 @@ class DataReader(object):
     def getTestData(self):
         return self.testData
 
+'''
     def get_iris_data(self):
         data = []
         label_map = ['Iris-setosa', 'Iris-versicolor', 'Iris-virginica']
@@ -44,3 +45,4 @@ class DataReader(object):
         for i, label in enumerate(label_map):
             inverse_label_map[label] = i
         return inverse_label_map
+'''
