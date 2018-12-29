@@ -1,12 +1,15 @@
+import os
+
 import  algorithm_3obj,  random, time
 import fuzzyRule_3obj
 
 
 class GA():
-    def __init__(self, dataset):
+    def __init__(self, dataset, logger):
         self.data = dataset
         self.p = [0.9, 0.25, 0.5, 0.9, 0.25]
         self.constant = [1]
+        self.logger=logger
 
     def init_run(self, size=150, gen_num=5):
         '''
@@ -39,6 +42,7 @@ class GA():
 
         time_end = time.time()
         time_cost = time_end - time_start
+
         # print("time cost: " + str(time_cost))
         # print("time each gen: " + str(time_cost / gen_num))
         # print()
@@ -54,6 +58,7 @@ class GA():
 
         time_end = time.time()
         time_cost = time_end - time_start
+        self.logger.write('{}\n'.format(time_cost))
         # print("time cost: " + str(time_cost))
         # print("time each gen: " + str(time_cost / gen_num))
         # print()

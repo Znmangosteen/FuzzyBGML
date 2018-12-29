@@ -9,12 +9,17 @@ from parallel.pop_pool import PopPool
 
 
 def run(dataset, pipe, size, init_gen, each_gen, total_time):
-    ga = GA(dataset)
+    logger_name = '{0}_{1}'.format(os.getpid(), time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()))
+    logger = open(logger_name, 'w', encoding='utf-8')
+    ga = GA(dataset, logger)
 
     # init part
     ga.init_run(size=size, gen_num=init_gen)
     pipe.send(ga.getPop())
-    pipe.recv()  # wait for a signal.
+    while True:
+        signal = pipe.recv()  # wait for a signal.
+        if signal == 'Run Main':
+            break
 
     # main part
     # while True:
@@ -28,6 +33,8 @@ def run(dataset, pipe, size, init_gen, each_gen, total_time):
         pipe.send(ga.getPop())
         new_pop = pipe.recv()
         ga.setPop(new_pop)
+
+    logger.close()
     pipe.send("END_FALG")
     pipe.send(ga.getPop())
 
