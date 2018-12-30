@@ -9,7 +9,7 @@ def NSGAII(population, p, gen_num, constant, trainingData, size=100) -> list:
 
     # 进化gen_num代
     for j in range(gen_num):
-        print("gen_num:" + str(j))
+        # print("gen_num:" + str(j))
         offspring_population = []
         pareto_ranking(population)
         # print("ranked")
@@ -56,7 +56,7 @@ def NSGAII(population, p, gen_num, constant, trainingData, size=100) -> list:
 
     pareto_ranking(population)
     # print("final ranked")
-    print()
+    # print()
 
     '''
         for RS in population:

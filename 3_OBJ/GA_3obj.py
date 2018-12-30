@@ -1,6 +1,7 @@
+import copy
 import os
 
-import  algorithm_3obj,  random, time
+import algorithm_3obj, random, time
 import fuzzyRule_3obj
 
 
@@ -9,7 +10,8 @@ class GA():
         self.data = dataset
         self.p = [0.9, 0.25, 0.5, 0.9, 0.25]
         self.constant = [1]
-        self.logger=logger
+        self.logger = logger
+        self.pareto_set = None
 
     def init_run(self, size=150, gen_num=5):
         '''
@@ -37,9 +39,9 @@ class GA():
         time_start = time.time()
         print("start")
         pareto_set, population = algorithm_3obj.NSGAII(population=population, p=self.p, gen_num=gen_num,
-                                                  constant=self.constant,
-                                                  size=size, trainingData=self.data)
-
+                                                       constant=self.constant,
+                                                       size=size, trainingData=self.data)
+        self.pareto_set = pareto_set
         time_end = time.time()
         time_cost = time_end - time_start
 
@@ -50,12 +52,11 @@ class GA():
         self.population = population
 
     def run(self, gen_num, size):
-
         time_start = time.time()
-        print("start")
-        pareto_set, population = algorithm_3obj.NSGAII(population=self.population, p=self.p, gen_num=gen_num,
-                                                  constant=self.constant, size=size, trainingData=self.data)
 
+        pareto_set, population = algorithm_3obj.NSGAII(population=self.population, p=self.p, gen_num=gen_num,
+                                                       constant=self.constant, size=size, trainingData=self.data)
+        self.pareto_set = pareto_set
         time_end = time.time()
         time_cost = time_end - time_start
         self.logger.write('{}\n'.format(time_cost))
@@ -70,6 +71,30 @@ class GA():
 
     def setPop(self, population):
         self.population = population
+
+    def setDataset(self, dataset):
+        self.data = dataset
+
+    def getBst(self):
+        max_acc = 0
+        bst=self.pareto_set[0]
+        for rule_set in self.pareto_set:
+            if rule_set.fitness > max_acc:
+                bst = rule_set
+                max_acc = rule_set.fitness
+
+        return copy.deepcopy(bst)
+
+    def updatePop(self, bst):
+        min_acc = 1
+        worst_idx=0
+        for i,rule_set in enumerate(self.population):
+            if rule_set.fitness < min_acc:
+                worst_idx = i
+                min_acc = rule_set.fitness
+
+        del self.population[worst_idx]
+        self.population.append(bst)
 
 
 # data, NClass, dictL2I, dictI2L = util.readData("./data/a1_va3.csv")

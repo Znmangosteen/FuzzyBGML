@@ -1,121 +1,119 @@
 import multiprocessing as mp
-import threading
+
 import algorithm_3obj, fuzzyRule_3obj, time, sys, os
+from parallel.Worker import Signal, Worker
 
 from parallel.data_distributor import DataDistributor
 from parallel.data_reader import DataReader
-from GA_3obj import GA
-from parallel.pop_pool import PopPool
-
-
-def run(dataset, pipe, size, init_gen, each_gen, total_time):
-    logger_name = 'time_log/time_{0}_{1}'.format(os.getpid(), time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()))
-    logger = open(logger_name, 'w', encoding='utf-8')
-    ga = GA(dataset, logger)
-
-    # init part
-    ga.init_run(size=size, gen_num=init_gen)
-    pipe.send(ga.getPop())
-    while True:
-        signal = pipe.recv()  # wait for a signal.
-        if signal == 'Run Main':
-            break
-
-    # main part
-    # while True:
-    for i in range(total_time):
-        # terminate_flag = ga.run(size=size, gen_num=each_gen)
-        # if terminate_flag:
-        #     break
-
-        ga.run(size=size, gen_num=each_gen)
-        # update pop
-        pipe.send(ga.getPop())
-        new_pop = pipe.recv()
-        ga.setPop(new_pop)
-
-    logger.close()
-    pipe.send("END_FALG")
-    pipe.send(ga.getPop())
-
-
-def lisen(pipe):
-    global popPool
-    global listen_lock
-    while True:
-        info = pipe.recv()
-        if info == "END_FALG":
-            fin_pop = pipe.recv()
-            popPool.insert_fin_pop(fin_pop)
-            break
-        pop = info
-        with listen_lock:
-            new_pop = popPool.update_pool(pop)
-        pipe.send(new_pop)
-
 
 if __name__ == '__main__':
 
     data_set = sys.argv[1]
     size = 264
     each_gen = int(sys.argv[2])
-    total_time = int(sys.argv[3])
-    gen_num = each_gen * total_time
+    iterations = int(sys.argv[3])
+    gen_num = each_gen * iterations
+
+    # data_set = 'a1_va3'
+    # size = 264
+    # each_gen = 10
+    # iterations = 2
+    # gen_num = each_gen * iterations
 
     # CPU_NUM = mp.cpu_count()
     CPU_NUM = 8
     reader = DataReader(data_set)
     distributor = DataDistributor(CPU_NUM)
-    popPool = PopPool()
-    listen_lock = threading.RLock()
 
     distributor.set_dataset(reader.getTrainingData())
     datasets = distributor.partition()
 
     init_worker = []
     pipe_conns = []
-    lisen_threads = []
+    pipes = [{} for _ in range(CPU_NUM)]
+
+    pops = []
+
+    # init_process_communication
+
+    for i in range(0, CPU_NUM, 2):
+        d_conn1_s, d_conn1_r = mp.Pipe()
+        d_conn2_s, d_conn2_r = mp.Pipe()
+        r_conn1_s, r_conn1_r = mp.Pipe()
+        r_conn2_s, r_conn2_r = mp.Pipe()
+        prev_idx = (i - 1) % CPU_NUM
+        next_idx = (i + 1) % CPU_NUM
+        pipes[prev_idx]['data_s'] = d_conn1_s
+        pipes[prev_idx]['ruleset_r'] = r_conn1_r
+        pipes[i] = {
+            'data_s': d_conn2_s,
+            'data_r': d_conn1_r,
+            'ruleset_s': r_conn1_s,
+            'ruleset_r': r_conn2_r,
+            'main': None
+        }
+        pipes[next_idx]['data_r'] = d_conn2_r
+        pipes[next_idx]['ruleset_s'] = r_conn2_s
+
     for i in range(CPU_NUM):
         parent_conn, child_conn = mp.Pipe()
-        worker = mp.Process(target=run, args=(datasets[i], child_conn, int(size / CPU_NUM), 5, each_gen, total_time))
-        lisener = threading.Thread(target=lisen, args=(parent_conn,))
+        pipes[i]['main'] = child_conn
+        worker = Worker(i, datasets[i], pipes[i], int(size / CPU_NUM), 1, each_gen, iterations, verbose=True)
+
         init_worker.append(worker)
-        lisen_threads.append(lisener)
         pipe_conns.append(parent_conn)
 
     for worker in init_worker:
         worker.start()
 
-    pops = []
-    for conn in pipe_conns:
-        pop = conn.recv()
-        pops.extend(pop)
-
-    popPool.init_pool(pops)
-
     start = time.time()
-
-    # run main part
-    for lisen_thread in lisen_threads:
-        lisen_thread.start()
+    for conn in pipe_conns:
+        while True:
+            signal = conn.recv()
+            if signal == Signal.FirstStepDone:
+                break
 
     # send run main signal
-    for conn in pipe_conns:
-        conn.send('Run Main')
+    for pipe in pipe_conns:
+        pipe.send(Signal.StartMain)
 
-    for lisen_thread in lisen_threads:
-        lisen_thread.join()
+    while True:
+        cnt = 0
+        signal = None
+        for pipe in pipe_conns:
+            signal = pipe.recv()
+            if signal == Signal.Terminate:
+                pop = pipe.recv()
+                pops.extend(pop)
+            elif signal == Signal.OneIterDone:
+                cnt += 1
+
+        if signal == Signal.Terminate:
+            print('islands all finished')
+            break
+        elif signal == Signal.OneIterDone:
+            print('Start Rotate')
+            for i, pipe in enumerate(pipe_conns):
+                if i == 0:
+                    pipe.send(Signal.StartRotateData)
+                elif i == CPU_NUM - 1:
+                    pipe.send(Signal.StartRotateRuleSet)
+                else:
+                    pipe.send(Signal.WaitRotate)
+
+        cnt = 0
 
     train_data = reader.getTrainingData()
     test_data = reader.getTestData()
-    fin_pop = popPool.get_fin_pop()
+    fin_pop = pops
+
     for RS in fin_pop:
         RS.getFitness(train_data)
 
     algorithm_3obj.pareto_ranking(fin_pop)
 
     time_cost = time.time() - start
-    each_time = time_cost / (each_gen * total_time)
+    each_time = time_cost / (each_gen * iterations)
 
     time_info = "time cost: " + str(time_cost) + '\r' + "time each gen: " + str(each_time)
     RS_info = ''
