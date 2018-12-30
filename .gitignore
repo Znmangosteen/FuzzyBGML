@@ -1,1 +1,2 @@
-/time_log/
+/time_log/*.txt
+/__pycache__/
