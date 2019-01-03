@@ -83,45 +83,91 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-# setup the figure and axes
-fig = plt.figure(figsize=(8, 8))
-ax1 = fig.add_subplot(111, projection='3d')
-# ax2 = fig.add_subplot(122, projection='3d')
 
-data = np.loadtxt("D:/program/3rd_year_project/Fuzzy-BW/FuzzyGBML/3_OBJ/运行结果/a1_va3/figure/8 c 4 g 3000 s 264 e 50.txt")
+def draw(fname,color,ecolor):
+    global data, _x, _y, x, y, top, bottom
+    data = np.loadtxt("D:/program/3rd_year_project/Fuzzy-BW/FuzzyGBML/3_OBJ/运行结果/a1_va3/figure/" + fname)
+    _x = data[:, 1]
+    _x = _x - 0.5
+    _y = data[:, 2]
+    _y = _y - 0.5
+    x, y = _x, _y
+    top = 1 - data[:, 0]
+    bottom = np.zeros_like(top)
+    ax1.bar3d(x, y, bottom, width, depth, top, color=color, edgecolors=ecolor, zsort='min')
 
-# fake data
-# _x = np.arange(4)
-_x = data[:, 1]
-# _x = _x - 0.5
-# _y = np.arange(5)
-_y = data[:, 2]
-# _y = _y - 0.5
-_xx, _yy = np.meshgrid(_x, _y)
-# x, y = _xx.ravel(), _yy.ravel()
-x, y = _x, _y
-top = 1 - data[:, 0]
-# top = x + y
-bottom = np.zeros_like(top)
-width = 1
-depth = 1.8
 
-ax1.bar3d(x, y, bottom, width, depth, top, color='#FFCEEF88',edgecolors='#BFAB6E',zsort='min')
-ax1.set_title('Shaded')
-#
-# ax2.bar3d(x, y, bottom, width, depth, top, shade=False)
-# ax2.set_title('Not Shaded')
-ax1.set_zlabel('error rate')  # 坐标轴
-ax1.set_ylabel('number of antecedent conditions')
-ax1.set_xlabel('number of rules')
 
-# filled = np.ones_like(x)
-# filled = np.zeros((50, 50, 50), dtype=bool)
-# fcolor = np.where(filled, '#FFD65DC0', '#7A88CCC0')
-# ecolor = np.where(filled, '#BFAB6E', '#7D84A6')
-#
-# ax1.voxels(x, y, top, filled, facecolors=fcolor, edgecolors=ecolor)
-plt.xlim(0,15)
-plt.ylim(0,30)
-# plt.show()
-plt.savefig('../3_OBJ/运行结果/a1_va3/figure/test.png')
+if __name__ == '__main__':
+
+    # setup the figure and axes
+    fig = plt.figure(figsize=(10, 10))
+    ax1 = fig.add_subplot(111, projection='3d')
+    # ax2 = fig.add_subplot(122, projection='3d')
+
+    data = np.loadtxt("D:/program/3rd_year_project/Fuzzy-BW/FuzzyGBML/3_OBJ/运行结果/a1_va3/figure/temp.txt")
+
+    # fake data
+    # _x = np.arange(4)
+    _x = data[:, 1]
+    _x = _x - 0.5
+    # _y = np.arange(5)
+    _y = data[:, 2]
+    _y = _y - 0.5
+    _xx, _yy = np.meshgrid(_x, _y)
+    # x, y = _xx.ravel(), _yy.ravel()
+    x, y = _x, _y
+    top = 1 - data[:, 0]
+    # top = x + y
+    bottom = np.zeros_like(top)
+    width = 1
+    depth = 1.8
+
+    ax1.bar3d(x, y, bottom, width, depth, top, color='#1136561E', edgecolors='#0E2E49', zsort='min')
+
+    fname = 'temp2.txt'
+    color = '#FE6F6120'
+    ecolor = '#FE6F61'
+
+    # draw(fname,color,ecolor)
+
+    fname = 'temp3.txt'
+    color = '#FE6F6120'
+    ecolor = '#FE6F61'
+
+    # draw(fname,color,ecolor)
+
+    fname = 'temp4.txt'
+    color = '#FE6F6120'
+    ecolor = '#FE6F61'
+
+    # draw(fname,color,ecolor)
+
+    blue_proxy = plt.Rectangle((5, 5), 5, 5, fc="#113656")
+    red_proxy = plt.Rectangle((0, 0), 5, 5, fc="#FE6F61")
+    # ax1.legend([blue_proxy, red_proxy], ['Island model', 'Asynchronous-island model'])
+    # ax1.legend([blue_proxy,red_proxy],['training data','test data'])
+
+    # name = 'non-parallel on training data'
+    # name = 'non-parallel on training data'
+    # name = 'non-parallel on test data'
+    # name = 'non-parallel'
+    name = 'Island model '
+
+
+    ax1.set_title(name)
+    #
+    # ax2.bar3d(x, y, bottom, width, depth, top, shade=False)
+    # ax2.set_title('Not Shaded')
+    ax1.set_zlabel('error rate')  # 坐标轴
+    ax1.set_ylabel('number of antecedent conditions')
+    ax1.set_xlabel('number of rules')
+
+    # ax1.voxels(x, y, top, filled, facecolors=fcolor, edgecolors=ecolor)
+    plt.xlim(0, 15)
+    plt.ylim(0, 30)
+
+
+
+    plt.show()
+    # plt.savefig('../3_OBJ/运行结果/a1_va3/figure/' + name + '.png')

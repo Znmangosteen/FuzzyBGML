@@ -63,7 +63,7 @@ if __name__ == '__main__':
     gen_num = each_gen * total_time
 
     # CPU_NUM = mp.cpu_count()
-    CPU_NUM = 4
+    CPU_NUM = 12
     reader = DataReader(data_set)
     distributor = DataDistributor(CPU_NUM)
     popPool = PopPool()
