@@ -50,30 +50,78 @@
 #
 # Detectionplot()
 
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
+# from mpl_toolkits.mplot3d import Axes3D
+# import matplotlib.pyplot as plt
+# import numpy as np
+#
+# fig = plt.figure()
+# ax = fig.add_subplot(111, projection='3d')
+# x, y = np.random.rand(2, 100) * 4
+#
+# hist, xedges, yedges = np.histogram2d(x, y, bins=4, range=[[0, 4], [0, 4]])
+#
+# # Construct arrays for the anchor positions of the 16 bars.
+# # Note: np.meshgrid gives arrays in (ny, nx) so we use 'F' to flatten xpos,
+# # ypos in column-major order. For numpy >= 1.7, we could instead call meshgrid
+# # with indexing='ij'.
+# xpos, ypos = np.meshgrid(xedges[:-1] + 0.25, yedges[:-1] + 0.25)
+# xpos = xpos.flatten('F')
+# ypos = ypos.flatten('F')
+# zpos = np.zeros_like(xpos)
+#
+# # Construct arrays with the dimensions for the 16 bars.
+# dx = 1 * np.ones_like(zpos)
+# dy = dx.copy()
+# dz = hist.flatten()
+#
+# ax.bar3d(xpos, ypos, zpos, dx, dy, dz, color='b', zsort='average')
+#
+# plt.show()
+
+
 import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-x, y = np.random.rand(2, 100) * 4
+# setup the figure and axes
+fig = plt.figure(figsize=(8, 8))
+ax1 = fig.add_subplot(111, projection='3d')
+# ax2 = fig.add_subplot(122, projection='3d')
 
-hist, xedges, yedges = np.histogram2d(x, y, bins=4, range=[[0, 4], [0, 4]])
+data = np.loadtxt("D:/program/3rd_year_project/Fuzzy-BW/FuzzyGBML/3_OBJ/运行结果/a1_va3/figure/8 c 4 g 3000 s 264 e 50.txt")
 
-# Construct arrays for the anchor positions of the 16 bars.
-# Note: np.meshgrid gives arrays in (ny, nx) so we use 'F' to flatten xpos,
-# ypos in column-major order. For numpy >= 1.7, we could instead call meshgrid
-# with indexing='ij'.
-xpos, ypos = np.meshgrid(xedges[:-1] + 0.25, yedges[:-1] + 0.25)
-xpos = xpos.flatten('F')
-ypos = ypos.flatten('F')
-zpos = np.zeros_like(xpos)
+# fake data
+# _x = np.arange(4)
+_x = data[:, 1]
+# _x = _x - 0.5
+# _y = np.arange(5)
+_y = data[:, 2]
+# _y = _y - 0.5
+_xx, _yy = np.meshgrid(_x, _y)
+# x, y = _xx.ravel(), _yy.ravel()
+x, y = _x, _y
+top = 1 - data[:, 0]
+# top = x + y
+bottom = np.zeros_like(top)
+width = 1
+depth = 1.8
 
-# Construct arrays with the dimensions for the 16 bars.
-dx = 1 * np.ones_like(zpos)
-dy = dx.copy()
-dz = hist.flatten()
+ax1.bar3d(x, y, bottom, width, depth, top, color='#FFCEEF88',edgecolors='#BFAB6E',zsort='min')
+ax1.set_title('Shaded')
+#
+# ax2.bar3d(x, y, bottom, width, depth, top, shade=False)
+# ax2.set_title('Not Shaded')
+ax1.set_zlabel('error rate')  # 坐标轴
+ax1.set_ylabel('number of antecedent conditions')
+ax1.set_xlabel('number of rules')
 
-ax.bar3d(xpos, ypos, zpos, dx, dy, dz, color='b', zsort='average')
-
-plt.show()
+# filled = np.ones_like(x)
+# filled = np.zeros((50, 50, 50), dtype=bool)
+# fcolor = np.where(filled, '#FFD65DC0', '#7A88CCC0')
+# ecolor = np.where(filled, '#BFAB6E', '#7D84A6')
+#
+# ax1.voxels(x, y, top, filled, facecolors=fcolor, edgecolors=ecolor)
+plt.xlim(0,15)
+plt.ylim(0,30)
+# plt.show()
+plt.savefig('../3_OBJ/运行结果/a1_va3/figure/test.png')

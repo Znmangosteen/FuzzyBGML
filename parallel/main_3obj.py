@@ -9,7 +9,7 @@ from parallel.pop_pool import PopPool
 
 
 def run(dataset, pipe, size, init_gen, each_gen, total_time):
-    logger_name = 'time_log/time_{0}_{1}'.format(os.getpid(), time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()))
+    logger_name = '../time_log/time_{0}_{1}'.format(os.getpid(), time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()))
     logger = open(logger_name, 'w', encoding='utf-8')
     ga = GA(dataset, logger)
 
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     gen_num = each_gen * total_time
 
     # CPU_NUM = mp.cpu_count()
-    CPU_NUM = 8
+    CPU_NUM = 4
     reader = DataReader(data_set)
     distributor = DataDistributor(CPU_NUM)
     popPool = PopPool()
