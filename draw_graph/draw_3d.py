@@ -84,7 +84,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 
-def draw(fname,color,ecolor):
+def draw(fname, color, ecolor):
     global data, _x, _y, x, y, top, bottom
     data = np.loadtxt("D:/program/3rd_year_project/Fuzzy-BW/FuzzyGBML/3_OBJ/运行结果/a1_va3/figure/" + fname)
     _x = data[:, 1]
@@ -97,9 +97,7 @@ def draw(fname,color,ecolor):
     ax1.bar3d(x, y, bottom, width, depth, top, color=color, edgecolors=ecolor, zsort='min')
 
 
-
 if __name__ == '__main__':
-
     # setup the figure and axes
     fig = plt.figure(figsize=(10, 10))
     ax1 = fig.add_subplot(111, projection='3d')
@@ -129,7 +127,7 @@ if __name__ == '__main__':
     color = '#FE6F6120'
     ecolor = '#FE6F61'
 
-    # draw(fname,color,ecolor)
+    draw(fname, color, ecolor)
 
     fname = 'temp3.txt'
     color = '#FE6F6120'
@@ -145,17 +143,25 @@ if __name__ == '__main__':
 
     blue_proxy = plt.Rectangle((5, 5), 5, 5, fc="#113656")
     red_proxy = plt.Rectangle((0, 0), 5, 5, fc="#FE6F61")
-    # ax1.legend([blue_proxy, red_proxy], ['Island model', 'Asynchronous-island model'])
+    ax1.legend([blue_proxy, red_proxy], ['Island model', 'Asynchronous-island model'])
     # ax1.legend([blue_proxy,red_proxy],['training data','test data'])
 
     # name = 'non-parallel on training data'
     # name = 'non-parallel on training data'
     # name = 'non-parallel on test data'
     # name = 'non-parallel'
-    name = 'Island model '
-
+    # name = 'Island model 100 gen'
+    # name = 'Asynchronous-island model 8 cores 100 gen'
+    # name = 'Asynchronous-island model 4 cores 100 gen'
+    # name = 'Asynchronous-island model 12 cores 100 gen'
+    # name='comparing on different model 8 cores 10 gen training data'
+    gen = '10'
+    # name = 'comparing on different model 8 cores 100 gen test data'
+    name = 'comparing on different cores 100 gen train data'
+    # name = 'comparing on different cores 100 gen test data'
 
     ax1.set_title(name)
+
     #
     # ax2.bar3d(x, y, bottom, width, depth, top, shade=False)
     # ax2.set_title('Not Shaded')
@@ -166,8 +172,6 @@ if __name__ == '__main__':
     # ax1.voxels(x, y, top, filled, facecolors=fcolor, edgecolors=ecolor)
     plt.xlim(0, 15)
     plt.ylim(0, 30)
-
-
 
     plt.show()
     # plt.savefig('../3_OBJ/运行结果/a1_va3/figure/' + name + '.png')
