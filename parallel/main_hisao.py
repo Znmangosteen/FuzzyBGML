@@ -8,17 +8,17 @@ from parallel.data_reader import DataReader
 
 if __name__ == '__main__':
 
-    data_set = sys.argv[1]
-    size = 264
-    each_gen = int(sys.argv[2])
-    iterations = int(sys.argv[3])
-    gen_num = each_gen * iterations
-
-    # data_set = 'a1_va3'
+    # data_set = sys.argv[1]
     # size = 264
-    # each_gen = 10
-    # iterations = 2
+    # each_gen = int(sys.argv[2])
+    # iterations = int(sys.argv[3])
     # gen_num = each_gen * iterations
+
+    data_set = 'a1_va3'
+    size = 264
+    each_gen = 10
+    iterations = 2
+    gen_num = each_gen * iterations
 
     # CPU_NUM = mp.cpu_count()
     CPU_NUM = 8

@@ -52,14 +52,14 @@ class GA():
         self.population = population
 
     def run(self, gen_num, size):
-        time_start = time.time()
+        # time_start = time.time()
 
         pareto_set, population = algorithm_3obj.NSGAII(population=self.population, p=self.p, gen_num=gen_num,
                                                        constant=self.constant, size=size, trainingData=self.data)
         self.pareto_set = pareto_set
-        time_end = time.time()
-        time_cost = time_end - time_start
-        self.logger.write('{}\n'.format(time_cost))
+        # time_end = time.time()
+        # time_cost = time_end - time_start
+        # self.logger.write('{}\n'.format(time_cost))
         # print("time cost: " + str(time_cost))
         # print("time each gen: " + str(time_cost / gen_num))
         # print()

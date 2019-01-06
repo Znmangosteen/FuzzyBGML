@@ -9,7 +9,7 @@ from parallel.pop_pool import PopPool
 
 
 def run(dataset, pipe, size, init_gen, each_gen, total_time):
-    logger_name = '../time_log/time_{0}_{1}'.format(os.getpid(), time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()))
+    logger_name = '../time_log/time_{0}_{1}.txt'.format(os.getpid(), time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()))
     logger = open(logger_name, 'w', encoding='utf-8')
     ga = GA(dataset, logger)
 
@@ -27,12 +27,17 @@ def run(dataset, pipe, size, init_gen, each_gen, total_time):
         # terminate_flag = ga.run(size=size, gen_num=each_gen)
         # if terminate_flag:
         #     break
-
+        time_start = time.time()
         ga.run(size=size, gen_num=each_gen)
+        communi_start = time.time()
         # update pop
         pipe.send(ga.getPop())
         new_pop = pipe.recv()
         ga.setPop(new_pop)
+        time_end = time.time()
+        time_cost = time_end - time_start
+        communi_time=time_end-communi_start
+        logger.write('{} {}\n'.format(time_cost,communi_time))
 
     logger.close()
     pipe.send("END_FALG")
@@ -56,11 +61,18 @@ def lisen(pipe):
 
 if __name__ == '__main__':
 
-    data_set = sys.argv[1]
+    # data_set = sys.argv[1]
+    # size = 264
+    # each_gen = int(sys.argv[2])
+    # iterations = int(sys.argv[3])
+
+    data_set = 'a1_va3'
     size = 264
-    each_gen = int(sys.argv[2])
-    total_time = int(sys.argv[3])
-    gen_num = each_gen * total_time
+    each_gen = 10
+    iterations = 2
+
+
+    gen_num = each_gen * iterations
 
     # CPU_NUM = mp.cpu_count()
     CPU_NUM = 12
@@ -77,7 +89,7 @@ if __name__ == '__main__':
     lisen_threads = []
     for i in range(CPU_NUM):
         parent_conn, child_conn = mp.Pipe()
-        worker = mp.Process(target=run, args=(datasets[i], child_conn, int(size / CPU_NUM), 5, each_gen, total_time))
+        worker = mp.Process(target=run, args=(datasets[i], child_conn, int(size / CPU_NUM), 5, each_gen, iterations))
         lisener = threading.Thread(target=lisen, args=(parent_conn,))
         init_worker.append(worker)
         lisen_threads.append(lisener)
@@ -115,7 +127,7 @@ if __name__ == '__main__':
     algorithm_3obj.pareto_ranking(fin_pop)
 
     time_cost = time.time() - start
-    each_time = time_cost / (each_gen * total_time)
+    each_time = time_cost / (each_gen * iterations)
 
     time_info = "time cost: " + str(time_cost) + '\r' + "time each gen: " + str(each_time)
     RS_info = ''

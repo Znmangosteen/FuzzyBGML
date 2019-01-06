@@ -57,12 +57,13 @@ class Worker(mp.Process):
 
         # main part
         for i in range(iterations):
+            time_start = time.time()
             ga.run(size=size, gen_num=each_gen)
             if verbose:
                 print("cpu:{} iter:{}".format(cpuid,i+1))
             m_pipe.send(Signal.OneIterDone)
             rotate_signal = m_pipe.recv()
-
+            rotate_start=time.time()
             # rotate
             if (rotate_signal == Signal.StartRotateData):
                 dataset = ga.data
@@ -120,9 +121,11 @@ class Worker(mp.Process):
                 if verbose:
                     print('cpu{} ruleset send complete'.format(cpuid))
 
+            time_end = time.time()
+            time_cost = time_end - time_start
+            rotate_time=time_end-rotate_start
+            logger.write('{} {}\n'.format(time_cost,rotate_time))
+
         logger.close()
         m_pipe.send(Signal.Terminate)
         m_pipe.send(ga.getPop())
-
-    def island_listen(self, r_pipe, ):
-        pass
